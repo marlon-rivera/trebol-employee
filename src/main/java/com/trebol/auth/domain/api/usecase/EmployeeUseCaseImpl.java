@@ -82,6 +82,16 @@ public class EmployeeUseCaseImpl implements IEmployeeServicePort {
         return new Auth(jwtPort.getToken(employee.getId(), employee.getRole().name(), employee.getEmail()));
     }
 
+    @Override
+    public String getNameEmployee(String id) {
+        Optional<Employee> employeeOptional = persistencePort.findEmployeeById(id);
+        if(employeeOptional.isEmpty()){
+            throw new EmployeeNotFoundException();
+        }
+        Employee employee = employeeOptional.get();
+        return employee.getName() + " " + employee.getLastName();
+    }
+
     private String generatePassword() {
         StringBuilder password = new StringBuilder(Constants.LENGTH_PASSWORD);
 

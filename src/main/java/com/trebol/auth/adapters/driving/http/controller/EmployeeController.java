@@ -58,4 +58,9 @@ public class EmployeeController {
     public ResponseEntity<Auth> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(employeeService.login(loginRequest.getEmail(), loginRequest.getPassword()));
     }
+
+    @GetMapping("/{id}")
+    public String getEmployeeName(@PathVariable String id){
+        return employeeService.getNameEmployee(id);
+    }
 }

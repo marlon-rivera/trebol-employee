@@ -12,4 +12,5 @@ public interface IEmployeeServicePort {
     void deleteEmployee(String id);
     List<Employee> getEmployees();
     Auth login(String email, String password);
+    String getNameEmployee(String id);
 }
