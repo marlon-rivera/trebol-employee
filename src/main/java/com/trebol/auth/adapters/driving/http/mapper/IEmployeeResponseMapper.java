@@ -10,7 +10,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface IEmployeeResponseMapper {
 
-    @Mapping(target = "id", source = "employee.id")
     EmployeeResponse toEmployeeResponse(Employee employee);
 
     List<EmployeeResponse> toEmployeeResponses(List<Employee> employees);
