@@ -7,7 +7,7 @@ public class Constants {
     public static final String HEADER_AUTH = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static int LENGTH_PASSWORD = 12;
-    public static final String CHARACTERS_PASSWORD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?";
+    public static final String CHARACTERS_PASSWORD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*()_+[]{}<>?";
     public static final String EMPLOYEE_ALREADY_EXISTS_EXCEPTION = "Un empleado con el mismo correo o número de identifiación ya esta registrado.";
     public static final String EMPLOYEE_NOT_FOUND_EXCEPTION = "El empleado solicitado no se encuentra registrado en la base de datos.";
     public static final String EMAIL = "email";

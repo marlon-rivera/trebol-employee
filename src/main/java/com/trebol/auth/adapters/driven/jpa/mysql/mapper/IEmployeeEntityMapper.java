@@ -14,6 +14,7 @@ public interface IEmployeeEntityMapper {
     @Mapping(target = "id", source = "employee.id")
     EmployeeEntity toEntity(Employee employee);
 
+    @Mapping(target = "id", source = "employeeEntity.id")
     Employee toEmployee(EmployeeEntity employeeEntity);
 
     default Optional<Employee> toEmployeeOptional(Optional<EmployeeEntity> employeeEntityOp){

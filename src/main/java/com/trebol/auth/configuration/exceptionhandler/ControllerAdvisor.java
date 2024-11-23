@@ -1,5 +1,7 @@
 package com.trebol.auth.configuration.exceptionhandler;
 
+import com.trebol.auth.domain.exception.CodeInvalidException;
+import com.trebol.auth.domain.exception.JwtExpiredException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,7 +11,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,6 +43,20 @@ public class ControllerAdvisor {
                 .toList();
         return ResponseEntity.badRequest().body(
                 new ValidationExceptionResponse(errorsMessages, HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now())
+        );
+    }
+
+    @ExceptionHandler(JwtExpiredException.class)
+    public ResponseEntity<ExceptionResponse> handleExpiredJwtException(JwtExpiredException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ExceptionResponse("Sesión expirada, ingrese nuevamente.", HttpStatus.UNAUTHORIZED.toString(), LocalDateTime.now())
+        );
+    }
+
+    @ExceptionHandler(CodeInvalidException.class)
+    public ResponseEntity<ExceptionResponse> handleCodeInvalidException(CodeInvalidException ex) {
+        return ResponseEntity.badRequest().body(
+                new ExceptionResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now())
         );
     }
 }

@@ -7,6 +7,7 @@ import com.trebol.auth.adapters.driven.jpa.mysql.mapper.IEmployeeEntityMapper;
 import com.trebol.auth.adapters.driven.jpa.mysql.repository.IEmployeeRepository;
 import com.trebol.auth.adapters.driven.jwt.AuthenticationAdapter;
 import com.trebol.auth.adapters.driven.jwt.JwtAdapter;
+import com.trebol.auth.adapters.driven.nosql.redis.RecoverPasswordAdapter;
 import com.trebol.auth.configuration.jwt.JwtService;
 import com.trebol.auth.domain.api.IEmployeeServicePort;
 import com.trebol.auth.domain.api.usecase.EmployeeUseCaseImpl;
@@ -14,6 +15,9 @@ import com.trebol.auth.domain.spi.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,8 +61,22 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IEmployeeServicePort employeeServicePort() {
-        return new EmployeeUseCaseImpl(employeePersistencePort(), encoderPort(), authenticationPort(), jwtPort(), emailPort(), new SecureRandom());
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        return template;
+    }
+
+    @Bean
+    public IRecoveryPasswordPort recoveryPasswordPort(RedisTemplate<String, String> redisTemplate) {
+        return new RecoverPasswordAdapter(redisTemplate);
+    }
+
+    @Bean
+    public IEmployeeServicePort employeeServicePort(IRecoveryPasswordPort recoveryPasswordPort) {
+        return new EmployeeUseCaseImpl(employeePersistencePort(), encoderPort(), authenticationPort(), jwtPort(), emailPort(), new SecureRandom(), recoveryPasswordPort);
     }
 
 

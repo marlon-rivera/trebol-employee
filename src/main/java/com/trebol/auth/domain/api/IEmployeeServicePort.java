@@ -13,4 +13,7 @@ public interface IEmployeeServicePort {
     List<Employee> getEmployees();
     Auth login(String email, String password);
     String getNameEmployee(String id);
+    Employee getEmployee();
+    void generateCodeRecoverPassword(String email);
+    void validateCodeRecoverPassword(String email, String code, String password);
 }

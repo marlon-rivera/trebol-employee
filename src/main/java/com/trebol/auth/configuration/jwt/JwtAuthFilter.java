@@ -1,6 +1,8 @@
 package com.trebol.auth.configuration.jwt;
 
+import com.trebol.auth.domain.exception.JwtExpiredException;
 import com.trebol.auth.utils.Constants;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,11 +35,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        username = jwtService.getSubjectFromToken(token);
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            authenticate(username, token, request);
+        try{
+            username = jwtService.getSubjectFromToken(token);
+            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+                authenticate(username, token, request);
+            }
+            filterChain.doFilter(request, response);
+        }catch (ExpiredJwtException ex){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
-        filterChain.doFilter(request, response);
+
     }
 
     private void authenticate(String username, String token, HttpServletRequest request) {

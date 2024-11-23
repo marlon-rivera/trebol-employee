@@ -1,6 +1,7 @@
 package com.trebol.auth.domain.api.usecase;
 
 import com.trebol.auth.domain.api.IEmployeeServicePort;
+import com.trebol.auth.domain.exception.CodeInvalidException;
 import com.trebol.auth.domain.exception.EmployeeAlreadyExistsException;
 import com.trebol.auth.domain.exception.EmployeeIncorrectPasswordException;
 import com.trebol.auth.domain.exception.EmployeeNotFoundException;
@@ -24,6 +25,7 @@ public class EmployeeUseCaseImpl implements IEmployeeServicePort {
     private final IJwtPort jwtPort;
     private final IEmailPort emailPort;
     private final SecureRandom random;
+    private final IRecoveryPasswordPort recoveryPasswordPort;
 
     @Override
     public void createEmployee(Employee employee) {
@@ -90,6 +92,46 @@ public class EmployeeUseCaseImpl implements IEmployeeServicePort {
         }
         Employee employee = employeeOptional.get();
         return employee.getName() + " " + employee.getLastName();
+    }
+
+    @Override
+    public Employee getEmployee() {
+        String id = authenticationPort.getCurrentUsername();
+        Optional<Employee> employeeOptional = persistencePort.findEmployeeById(id);
+        if(employeeOptional.isEmpty()){
+            throw new EmployeeNotFoundException();
+        }
+        Employee employee = employeeOptional.get();
+        employee.setRole(null);
+        employee.setPassword(null);
+        return employee;
+    }
+
+    @Override
+    public void generateCodeRecoverPassword(String email) {
+        Optional<Employee> employeeOptional = persistencePort.findEmployeeByEmail(email);
+        if (employeeOptional.isEmpty()){
+            throw new EmployeeNotFoundException();
+        }
+        String codeRecoveryPassword = recoveryPasswordPort.generateRecoverCode(email);
+        Employee employee = employeeOptional.get();
+        System.out.println(employee);
+        emailPort.sendEmailRecoveryPassword(email, codeRecoveryPassword, employee.getName() + " " + employee.getLastName());
+    }
+
+    @Override
+    public void validateCodeRecoverPassword(String email, String code, String password) {
+        Optional<Employee> employeeOptional = persistencePort.findEmployeeByEmail(email);
+        if (employeeOptional.isEmpty()){
+            throw new EmployeeNotFoundException();
+        }
+        boolean valid = recoveryPasswordPort.validateRecoverCode(email, code);
+        if(!valid){
+            throw new CodeInvalidException();
+        }
+        Employee employee = employeeOptional.get();
+        employee.setPassword(encoderPort.encode(password));
+        persistencePort.createEmployeeOrUpdate(employee);
     }
 
     private String generatePassword() {
