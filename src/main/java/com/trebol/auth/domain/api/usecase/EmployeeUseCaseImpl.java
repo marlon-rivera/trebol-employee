@@ -109,6 +109,7 @@ public class EmployeeUseCaseImpl implements IEmployeeServicePort {
 
     @Override
     public void generateCodeRecoverPassword(String email) {
+        System.out.println(email);
         Optional<Employee> employeeOptional = persistencePort.findEmployeeByEmail(email);
         if (employeeOptional.isEmpty()){
             throw new EmployeeNotFoundException();
