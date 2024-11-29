@@ -24,13 +24,13 @@ public class EmployeeController {
     private final IEmployeeRequestMapper requestMapper;
     private final IEmployeeResponseMapper responseMapper;
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<Void> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
         employeeService.createEmployee(requestMapper.toEmployee(employeeRequest));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<Employee> getInfoEmployee(){
         return ResponseEntity.ok(employeeService.getEmployee());
     }
